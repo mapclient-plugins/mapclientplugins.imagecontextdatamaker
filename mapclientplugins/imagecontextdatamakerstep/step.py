@@ -2,12 +2,53 @@
 """
 MAP Client Plugin Step
 """
+import re
 import json
+import imghdr
+import imagesize
 
 from PySide import QtGui
 
+from opencmiss.zinc.context import Context
+from opencmiss.utils.zinc import create_finite_element_field, create_square_2d_finite_element, \
+    create_volume_image_field, create_material_using_image_field
+
 from mapclient.mountpoints.workflowstep import WorkflowStepMountPoint
 from mapclientplugins.imagecontextdatamakerstep.configuredialog import ConfigureDialog
+
+
+def try_int(s):
+    try:
+        return int(s)
+    except ValueError:
+        return s
+
+
+def alphanum_key(s):
+    """ Turn a string into a list of string and number chunks.
+        "z23a" -> ["z", 23, "a"]
+    """
+    return [try_int(c) for c in re.split('([0-9]+)', s)]
+
+
+class ImageContextData(object):
+
+    def __init__(self, context, frames_per_second, image_file_names):
+        self._context = context
+        self._frames_per_second = frames_per_second
+        self._image_file_names = image_file_names
+
+    def get_context(self):
+        return self._context
+
+    def get_frames_per_second(self):
+        return self._frames_per_second
+
+    def get_frame_count(self):
+        return len(self._image_file_names)
+
+    def get_image_file_names(self):
+        return self._image_file_names
 
 
 class ImageContextDataMakerStep(WorkflowStepMountPoint):
@@ -33,8 +74,7 @@ class ImageContextDataMakerStep(WorkflowStepMountPoint):
         self._portData0 = None # http://physiomeproject.org/workflow/1.0/rdf-schema#image_context_data
         self._portData1 = None # http://physiomeproject.org/workflow/1.0/rdf-schema#images
         # Config:
-        self._config = {}
-        self._config['identifier'] = ''
+        self._config = {'identifier': '', 'frames_per_second': 30}
 
     def execute(self):
         """
@@ -43,6 +83,13 @@ class ImageContextDataMakerStep(WorkflowStepMountPoint):
         may be connected up to a button in a widget for example.
         """
         # Put your execute step code here before calling the '_doneExecution' method.
+        context = Context('images')
+        region = create_model(context)
+        image_file_names = self._portData1.image_files()
+        frames_per_second = self._config['frames_per_second']
+        _load_images(image_file_names, frames_per_second, region)
+        image_context_data = ImageContextData(context, frames_per_second, image_file_names)
+        self._portData0 = image_context_data
         self._doneExecution()
 
     def setPortData(self, index, dataIn):
@@ -119,4 +166,48 @@ class ImageContextDataMakerStep(WorkflowStepMountPoint):
         d.setConfig(self._config)
         self._configured = d.validate()
 
+
+def create_model(context):
+    default_region = context.getDefaultRegion()
+    region = default_region.createChild('images')
+    coordinate_field = create_finite_element_field(region)
+    field_module = region.getFieldmodule()
+    scale_field = field_module.createFieldConstant([2, 3, 1])
+    scale_field.setName('scale')
+    duration_field = field_module.createFieldConstant(1.0)
+    duration_field.setManaged(True)
+    duration_field.setName('duration')
+    offset_field = field_module.createFieldConstant([+0.5, +0.5, 0.0])
+    scaled_coordinate_field = field_module.createFieldMultiply(scale_field, coordinate_field)
+    scaled_coordinate_field = field_module.createFieldAdd(scaled_coordinate_field, offset_field)
+    scaled_coordinate_field.setManaged(True)
+    scaled_coordinate_field.setName('scaled_coordinates')
+    create_square_2d_finite_element(field_module, coordinate_field,
+                                    [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [1.0, 1.0, 0.0]])
+
+    return region
+
+
+def _load_images(images, frames_per_second, region):
+    field_module = region.getFieldmodule()
+    frame_count = len(images)
+    image_dimensions = [0, 0]
+    image_based_material = None
+    if frame_count > 0:
+        # Assume all images have the same dimensions.
+        width, height = imagesize.get(images[0])
+        if width != -1 or height != -1:
+            cache = field_module.createFieldcache()
+            scale_field = field_module.findFieldByName('scale')
+            scale_field.assignReal(cache, [width, height, 1.0])
+            duration = frame_count / frames_per_second
+            duration_field = field_module.findFieldByName('duration')
+            duration_field.assignReal(cache, duration)
+            image_dimensions = [width, height]
+        image_field = create_volume_image_field(field_module, images)
+        image_based_material = create_material_using_image_field(region, image_field)
+        image_based_material.setName('images')
+        image_based_material.setManaged(True)
+
+    return image_dimensions, image_based_material
 
