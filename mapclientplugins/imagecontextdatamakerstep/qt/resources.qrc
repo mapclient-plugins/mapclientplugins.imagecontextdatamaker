@@ -1,0 +1,6 @@
+
+<RCC>
+  <qresource prefix="imagecontextdatamakerstep">
+    <file>images/utility.png</file>
+  </qresource>
+</RCC>
