@@ -33,10 +33,11 @@ def alphanum_key(s):
 
 class ImageContextData(object):
 
-    def __init__(self, context, frames_per_second, image_file_names):
+    def __init__(self, context, frames_per_second, image_file_names, image_dimensions):
         self._context = context
         self._frames_per_second = frames_per_second
         self._image_file_names = image_file_names
+        self._image_dimensions = image_dimensions
 
     def get_context(self):
         return self._context
@@ -49,6 +50,9 @@ class ImageContextData(object):
 
     def get_image_file_names(self):
         return self._image_file_names
+
+    def get_image_dimensions(self):
+        return self._image_dimensions
 
 
 class ImageContextDataMakerStep(WorkflowStepMountPoint):
@@ -87,8 +91,8 @@ class ImageContextDataMakerStep(WorkflowStepMountPoint):
         region = create_model(context)
         image_file_names = self._portData1.image_files()
         frames_per_second = self._config['frames_per_second']
-        _load_images(image_file_names, frames_per_second, region)
-        image_context_data = ImageContextData(context, frames_per_second, image_file_names)
+        image_dimensions, _ = _load_images(image_file_names, frames_per_second, region)
+        image_context_data = ImageContextData(context, frames_per_second, image_file_names, image_dimensions)
         self._portData0 = image_context_data
         self._doneExecution()
 
