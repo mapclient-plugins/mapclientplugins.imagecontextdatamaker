@@ -4,7 +4,6 @@ MAP Client Plugin Step
 """
 import re
 import json
-import imghdr
 import imagesize
 
 from PySide import QtGui
@@ -12,6 +11,7 @@ from PySide import QtGui
 from opencmiss.zinc.context import Context
 from opencmiss.utils.zinc import create_finite_element_field, create_square_2d_finite_element, \
     create_volume_image_field, create_material_using_image_field
+from opencmiss.zincwidgets.basesceneviewerwidget import BaseSceneviewerWidget
 
 from mapclient.mountpoints.workflowstep import WorkflowStepMountPoint
 from mapclientplugins.imagecontextdatamakerstep.configuredialog import ConfigureDialog
@@ -35,12 +35,17 @@ class ImageContextData(object):
 
     def __init__(self, context, frames_per_second, image_file_names, image_dimensions):
         self._context = context
+        self._shareable_widget = BaseSceneviewerWidget()
+        self._shareable_widget.set_context(context)
         self._frames_per_second = frames_per_second
         self._image_file_names = image_file_names
         self._image_dimensions = image_dimensions
 
     def get_context(self):
         return self._context
+
+    def get_shareable_open_gl_widget(self):
+        return self._shareable_widget
 
     def get_frames_per_second(self):
         return self._frames_per_second
