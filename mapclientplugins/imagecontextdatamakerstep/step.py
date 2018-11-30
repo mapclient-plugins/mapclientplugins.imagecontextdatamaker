@@ -79,9 +79,13 @@ class ImageContextDataMakerStep(WorkflowStepMountPoint):
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
                       'http://physiomeproject.org/workflow/1.0/rdf-schema#uses',
                       'http://physiomeproject.org/workflow/1.0/rdf-schema#images'))
+        self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
+                      'http://physiomeproject.org/workflow/1.0/rdf-schema#provides',
+                      'http://physiomeproject.org/workflow/1.0/rdf-schema#2d_image_dimension'))
         # Port data:
-        self._portData0 = None # http://physiomeproject.org/workflow/1.0/rdf-schema#image_context_data
-        self._portData1 = None # http://physiomeproject.org/workflow/1.0/rdf-schema#images
+        self._portData0 = None  # http://physiomeproject.org/workflow/1.0/rdf-schema#image_context_data
+        self._portData1 = None  # http://physiomeproject.org/workflow/1.0/rdf-schema#images
+        self._portData2 = None  # http://physiomeproject.org/workflow/1.0/rdf-schema#2d_image_dimension
         # Config:
         self._config = {'identifier': '', 'frames_per_second': 30}
 
@@ -99,6 +103,7 @@ class ImageContextDataMakerStep(WorkflowStepMountPoint):
         image_dimensions, _ = _load_images(image_file_names, frames_per_second, region)
         image_context_data = ImageContextData(context, frames_per_second, image_file_names, image_dimensions)
         self._portData0 = image_context_data
+        self._portData2 = image_dimensions
         self._doneExecution()
 
     def setPortData(self, index, dataIn):
@@ -120,7 +125,11 @@ class ImageContextDataMakerStep(WorkflowStepMountPoint):
 
         :param index: Index of the port to return.
         """
-        return self._portData0 # http://physiomeproject.org/workflow/1.0/rdf-schema#image_context_data
+        port_data = self._portData0  # image_context_data
+        if index == 2:
+            port_data = self._portData2  # 2d_image_dimension
+
+        return port_data
 
     def configure(self):
         """
