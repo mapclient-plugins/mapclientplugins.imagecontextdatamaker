@@ -1,5 +1,3 @@
-
-
 from PySide2 import QtWidgets
 from mapclientplugins.imagecontextdatamakerstep.ui_configuredialog import Ui_ConfigureDialog
 
@@ -39,8 +37,9 @@ class ConfigureDialog(QtWidgets.QDialog):
         result = QtWidgets.QMessageBox.Yes
         if not self.validate():
             result = QtWidgets.QMessageBox.warning(self, 'Invalid Configuration',
-                'This configuration is invalid.  Unpredictable behaviour may result if you choose \'Yes\', are you sure you want to save this configuration?)',
-                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
+                                                   'This configuration is invalid.  Unpredictable behaviour may result if you choose \'Yes\', are you sure you want to save this configuration?)',
+                                                   QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                   QtWidgets.QMessageBox.No)
 
         if result == QtWidgets.QMessageBox.Yes:
             QtWidgets.QDialog.accept(self)
@@ -82,4 +81,3 @@ class ConfigureDialog(QtWidgets.QDialog):
         self._previousIdentifier = config['identifier']
         self._ui.identifier_lineEdit.setText(config['identifier'])
         self._ui.framesPerSecond_spinBox.setValue(config['frames_per_second'])
-

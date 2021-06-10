@@ -1,4 +1,3 @@
-
 """
 MAP Client Plugin Step
 """
@@ -68,10 +67,10 @@ class ImageContextDataMakerStep(WorkflowStepMountPoint):
 
     def __init__(self, location):
         super(ImageContextDataMakerStep, self).__init__('Image Context Data Maker', location)
-        self._configured = False # A step cannot be executed until it has been configured.
+        self._configured = False  # A step cannot be executed until it has been configured.
         self._category = 'Utility'
         # Add any other initialisation code here:
-        self._icon =  QtGui.QImage(':/imagecontextdatamakerstep/images/utility.png')
+        self._icon = QtGui.QImage(':/imagecontextdatamakerstep/images/utility.png')
         # Ports:
         self.addPort(('http://physiomeproject.org/workflow/1.0/rdf-schema#port',
                       'http://physiomeproject.org/workflow/1.0/rdf-schema#provides',
@@ -115,7 +114,7 @@ class ImageContextDataMakerStep(WorkflowStepMountPoint):
         :param index: Index of the port to return.
         :param dataIn: The data to set for the port at the given index.
         """
-        self._portData1 = dataIn # http://physiomeproject.org/workflow/1.0/rdf-schema#images
+        self._portData1 = dataIn  # http://physiomeproject.org/workflow/1.0/rdf-schema#images
 
     def getPortData(self, index):
         """
@@ -228,4 +227,3 @@ def _load_images(images, frames_per_second, region):
         image_based_material.setManaged(True)
 
     return image_dimensions, image_based_material
-
