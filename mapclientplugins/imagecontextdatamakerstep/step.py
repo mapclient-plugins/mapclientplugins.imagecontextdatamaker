@@ -6,7 +6,7 @@ import re
 import json
 import imagesize
 
-from PySide import QtGui
+from PySide2 import QtGui
 
 from opencmiss.zinc.context import Context
 from opencmiss.utils.zinc import create_finite_element_field, create_square_2d_finite_element, \
