@@ -8,8 +8,6 @@ import imagesize
 from PySide2 import QtGui
 
 from opencmiss.zinc.context import Context
-# from opencmiss.utils.zinc import create_finite_element_field, create_square_2d_finite_element, \
-#     create_volume_image_field, create_material_using_image_field
 from opencmiss.utils.zinc.field import create_field_finite_element, create_field_volume_image
 from opencmiss.utils.zinc.material import create_material_using_image_field
 from opencmiss.utils.zinc.finiteelement import create_square_element
@@ -191,7 +189,6 @@ class ImageContextDataMakerStep(WorkflowStepMountPoint):
 def create_model(context):
     default_region = context.getDefaultRegion()
     region = default_region.createChild('images')
-    #coordinate_field = create_finite_element_field(region)
     coordinate_field = create_field_finite_element(region)
     field_module = region.getFieldmodule()
     scale_field = field_module.createFieldConstant([2, 3, 1])
@@ -204,8 +201,6 @@ def create_model(context):
     scaled_coordinate_field = field_module.createFieldAdd(scaled_coordinate_field, offset_field)
     scaled_coordinate_field.setManaged(True)
     scaled_coordinate_field.setName('scaled_coordinates')
-    # create_square_2d_finite_element(field_module, coordinate_field,
-    #                                 [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [1.0, 1.0, 0.0]])
     create_square_element(field_module, coordinate_field,
                                     [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [1.0, 1.0, 0.0]])
 
@@ -228,7 +223,6 @@ def _load_images(images, frames_per_second, region):
             duration_field = field_module.findFieldByName('duration')
             duration_field.assignReal(cache, duration)
             image_dimensions = [width, height]
-        #image_field = create_volume_image_field(field_module, images)
         image_field = create_field_volume_image(field_module, images)
         image_based_material = create_material_using_image_field(region, image_field)
         image_based_material.setName('images')
