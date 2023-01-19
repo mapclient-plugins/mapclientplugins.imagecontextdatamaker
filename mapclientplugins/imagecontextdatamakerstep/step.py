@@ -5,7 +5,7 @@ import re
 import json
 import imagesize
 
-from PySide2 import QtGui
+from PySide6 import QtGui
 
 from opencmiss.zinc.context import Context
 from opencmiss.utils.zinc.field import create_field_finite_element, create_field_volume_image
