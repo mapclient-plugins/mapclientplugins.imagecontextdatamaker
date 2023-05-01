@@ -7,12 +7,12 @@ import imagesize
 
 from PySide6 import QtGui
 
-from opencmiss.zinc.context import Context
-from opencmiss.utils.zinc.field import create_field_finite_element, create_field_volume_image
-from opencmiss.utils.zinc.material import create_material_using_image_field
-from opencmiss.utils.zinc.finiteelement import create_square_element
+from cmlibs.zinc.context import Context
+from cmlibs.utils.zinc.field import create_field_finite_element, create_field_volume_image
+from cmlibs.utils.zinc.material import create_material_using_image_field
+from cmlibs.utils.zinc.finiteelement import create_square_element
 
-from opencmiss.utils.zinc.widgets.basesceneviewerwidget import BaseSceneviewerWidget
+from cmlibs.widgets.basesceneviewerwidget import BaseSceneviewerWidget
 
 from mapclient.mountpoints.workflowstep import WorkflowStepMountPoint
 from mapclientplugins.imagecontextdatamakerstep.configuredialog import ConfigureDialog
